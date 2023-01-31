@@ -29,12 +29,14 @@ impl<'a> Todo<'a> {
             return;
         }
 
-        let mut todo_str = todo.clone();
-        todo_str.push('\n');
-
-        match self.file.as_mut().unwrap().write(todo_str.as_bytes()) {
+        match self
+            .file
+            .as_mut()
+            .unwrap()
+            .write(&[todo.as_bytes(), "\n".as_bytes()].concat())
+        {
             Err(err) => panic!("couldn't write {}: {}", self.path.display(), err),
-            Ok(_) => println!("todo added: {}", todo_str),
+            Ok(_) => println!("todo added: {}", todo),
         };
     }
 }
