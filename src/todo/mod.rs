@@ -1,3 +1,5 @@
+// Todo object for all our todo actions
+
 use std::fs::{File, OpenOptions};
 use std::io::Write;
 use std::path::Path;
@@ -7,8 +9,8 @@ pub struct Todo<'a> {
     pub path_name: &'a str,
 }
 
-// TODO: Seperate each function with its own file
 impl<'a> Todo<'a> {
+    // Create a todo file if not exists, as well as storing the File to our struct
     pub fn init(&mut self) {
         let path = Path::new(self.path_name);
         let path_name = path.display();
@@ -25,6 +27,7 @@ impl<'a> Todo<'a> {
         };
     }
 
+    // Write a new todo to our file
     pub fn write(&mut self, todo: &str) {
         if self.file.is_none() {
             return;
@@ -37,10 +40,8 @@ impl<'a> Todo<'a> {
     }
 }
 
+// Setting default values
 impl<'a> Default for Todo<'a> {
-    // TODO: try initializing the file in the default function (without the need for Todo.init()
-    // function)
-
     fn default() -> Self {
         Todo {
             file: Default::default(),
