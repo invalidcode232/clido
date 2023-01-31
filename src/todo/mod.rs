@@ -35,7 +35,7 @@ impl<'a> Todo<'a> {
 
         match self.file.as_mut().unwrap().write(todo.as_bytes()) {
             Err(err) => panic!("couldn't write {}: {}", self.path_name, err),
-            Ok(_) => println!("{} written successfully", self.path_name),
+            Ok(_) => println!("todo added: {}", self.path_name),
         };
     }
 }
