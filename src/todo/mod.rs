@@ -1,6 +1,6 @@
 // Todo object for all our todo actions
 use std::fs::{File, OpenOptions};
-use std::io::Write;
+use std::io::{BufRead, BufReader, Write};
 use std::path::Path;
 
 pub struct Todo<'a> {
@@ -38,6 +38,18 @@ impl<'a> Todo<'a> {
             Err(err) => panic!("couldn't write {}: {}", self.path.display(), err),
             Ok(_) => println!("todo added: {}", todo),
         };
+    }
+
+    pub fn list(&mut self) {
+        if self.file.is_none() {
+            return;
+        }
+
+        println!("Todo(s): ");
+        let reader = BufReader::new(self.file.as_mut().unwrap());
+        for line in reader.lines() {
+            println!("{}", line.unwrap());
+        }
     }
 }
 

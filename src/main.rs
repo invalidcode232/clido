@@ -10,6 +10,7 @@ struct Cli {
 #[derive(Subcommand)]
 enum Commands {
     Add { todo: String },
+    List {},
 }
 
 fn main() {
@@ -27,6 +28,9 @@ fn main() {
     match &cli.command {
         Some(Commands::Add { todo }) => {
             todo_client.write(todo);
+        }
+        Some(Commands::List {}) => {
+            todo_client.list();
         }
         None => (),
     }
