@@ -65,20 +65,36 @@ impl<'a> Default for Todo<'a> {
 
 #[cfg(test)]
 mod tests {
-    use std::env::temp_dir;
+    use std::{
+        fs::File,
+        io::{BufRead, BufReader},
+    };
+
+    use tempfile::tempdir;
 
     use super::Todo;
 
     #[test]
-    fn test_write_file() -> Result<(), String> {
-        let test_dir = temp_dir().join("\\todo.txt");
+    fn test_write_file() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join("todo.txt");
+        println!("{:?}", path);
+
         let mut todo_client = Todo {
-            path: test_dir.as_path(),
+            path: path.as_path(),
             ..Default::default()
         };
 
-        todo_client.write(&String::from("lol"));
+        todo_client.init();
+        todo_client.write(&String::from("test todo"));
 
-        Ok(())
+        let path_str = path.to_str().unwrap();
+        let file = File::open(path_str).unwrap();
+
+        let mut buf_reader = BufReader::new(file);
+        let mut contents = String::new();
+        buf_reader.read_line(&mut contents).unwrap();
+
+        assert_eq!(contents, "test todo\n")
     }
 }
