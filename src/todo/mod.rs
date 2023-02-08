@@ -88,9 +88,12 @@ mod tests {
         todo_client.init();
         todo_client.write(&String::from("test todo"));
 
+        // Read our file via tempdir
         let path_str = path.to_str().unwrap();
         let file = File::open(path_str).unwrap();
 
+        // not sure why todo_client.list() doesn't work, however we'll recreate a new BufReader
+        // with path_str
         let mut buf_reader = BufReader::new(file);
         let mut contents = String::new();
         buf_reader.read_line(&mut contents).unwrap();
