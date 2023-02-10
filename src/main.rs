@@ -1,5 +1,6 @@
 pub mod todo;
 use clap::{Parser, Subcommand};
+use todo::client;
 
 #[derive(Parser)]
 struct Cli {
@@ -16,7 +17,7 @@ enum Commands {
 fn main() {
     // Initialize our todo client with default values
     // TODO: Replace with the real path name
-    let mut todo_client = todo::TodoClient {
+    let mut todo_client = client::TodoClient {
         ..Default::default()
     };
 
