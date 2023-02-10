@@ -3,12 +3,12 @@ use std::fs::{File, OpenOptions};
 use std::io::{BufRead, BufReader, Write};
 use std::path::Path;
 
-pub struct Todo<'a> {
+pub struct TodoClient<'a> {
     pub file: Option<File>,
     pub path: &'a Path,
 }
 
-impl<'a> Todo<'a> {
+impl<'a> TodoClient<'a> {
     // Create a todo file if not exists, as well as storing the File to our struct
     pub fn init(&mut self) {
         self.file = match OpenOptions::new()
@@ -45,18 +45,31 @@ impl<'a> Todo<'a> {
             return;
         }
 
-        println!("Todo(s): ");
         let reader = BufReader::new(self.file.as_mut().unwrap());
+
+        let mut lines = Vec::new();
+
         for line in reader.lines() {
-            println!("{}", line.unwrap());
+            lines.push(line.unwrap());
         }
+
+        let lines_iter = lines.into_iter();
+        if lines_iter.clone().count() == 0 {
+            println!("No todo(s) found, add a todo by using `clido add [todo]`");
+            return;
+        }
+
+        println!("Todo(s): ");
+        lines_iter.for_each(|line| {
+            println!("{}", line);
+        });
     }
 }
 
 // Setting default values
-impl<'a> Default for Todo<'a> {
+impl<'a> Default for TodoClient<'a> {
     fn default() -> Self {
-        Todo {
+        TodoClient {
             file: Default::default(),
             path: Path::new("todo.txt"),
         }
@@ -72,15 +85,16 @@ mod tests {
 
     use tempfile::tempdir;
 
-    use super::Todo;
+    use super::TodoClient;
 
     #[test]
     fn test_write_file() {
+        // use tempdir for new file creation
         let dir = tempdir().unwrap();
         let path = dir.path().join("todo.txt");
         println!("{:?}", path);
 
-        let mut todo_client = Todo {
+        let mut todo_client = TodoClient {
             path: path.as_path(),
             ..Default::default()
         };
@@ -88,12 +102,12 @@ mod tests {
         todo_client.init();
         todo_client.write(&String::from("test todo"));
 
-        // Read our file via tempdir
+        // read our file
+        // not sure why todo_client.list() doesn't work, however we'll recreate a new BufReader
+        // with path_str
         let path_str = path.to_str().unwrap();
         let file = File::open(path_str).unwrap();
 
-        // not sure why todo_client.list() doesn't work, however we'll recreate a new BufReader
-        // with path_str
         let mut buf_reader = BufReader::new(file);
         let mut contents = String::new();
         buf_reader.read_line(&mut contents).unwrap();
