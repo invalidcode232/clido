@@ -5,6 +5,8 @@ use std::path::Path;
 
 use chrono::Local;
 
+use super::todo::Todo;
+
 pub struct TodoClient<'a> {
     pub file: Option<File>,
     pub path: &'a Path,
@@ -55,24 +57,34 @@ impl<'a> TodoClient<'a> {
             return;
         }
 
-        let reader = BufReader::new(self.file.as_mut().unwrap());
-
-        let mut lines = Vec::new();
-
-        for line in reader.lines() {
-            lines.push(line.unwrap());
+        let mut todos: Vec<Todo> = Vec::new();
+        let mut reader = csv::Reader::from_reader(self.file.as_ref().unwrap());
+        for result in reader.records() {
+            let data = result.unwrap();
+            todos.push(Todo {
+                todo: data[0].to_string(),
+                date_added: data[1].to_string(),
+            })
         }
 
-        let lines_iter = lines.into_iter();
-        if lines_iter.clone().count() == 0 {
-            println!("No todo(s) found, add a todo by using `clido add [todo]`");
-            return;
-        }
-
-        println!("Todo(s): ");
-        lines_iter.for_each(|line| {
-            println!("{}", line);
-        });
+        // let reader = BufReader::new(self.file.as_mut().unwrap());
+        //
+        // let mut lines = Vec::new();
+        //
+        // for line in reader.lines() {
+        //     lines.push(line.unwrap());
+        // }
+        //
+        // let lines_iter = lines.into_iter();
+        // if lines_iter.clone().count() == 0 {
+        //     println!("No todo(s) found, add a todo by using `clido add [todo]`");
+        //     return;
+        // }
+        //
+        // println!("Todo(s): ");
+        // lines_iter.for_each(|line| {
+        //     println!("{}", line);
+        // });
     }
 }
 
