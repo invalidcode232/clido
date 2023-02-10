@@ -3,6 +3,8 @@ use std::fs::{File, OpenOptions};
 use std::io::{BufRead, BufReader, Write};
 use std::path::Path;
 
+use chrono::Local;
+
 pub struct TodoClient<'a> {
     pub file: Option<File>,
     pub path: &'a Path,
@@ -29,15 +31,23 @@ impl<'a> TodoClient<'a> {
             return;
         }
 
-        match self
-            .file
-            .as_mut()
-            .unwrap()
-            .write(&[todo.as_bytes(), "\n".as_bytes()].concat())
-        {
-            Err(err) => panic!("couldn't write {}: {}", self.path.display(), err),
+        let mut writer = csv::Writer::from_path(self.path).unwrap();
+        let write_res =
+            writer.write_record(&[todo, &Local::now().format("%d/%m/%Y %H:%M").to_string()]);
+        match write_res {
             Ok(_) => println!("todo added: {}", todo),
-        };
+            Err(err) => println!("failed to write {}: {}", self.path.display(), err),
+        }
+
+        // match self
+        //     .file
+        //     .as_mut()
+        //     .unwrap()
+        //     .write(&[todo.as_bytes(), "\n".as_bytes()].concat())
+        // {
+        //     Err(err) => panic!("couldn't write {}: {}", self.path.display(), err),
+        //     Ok(_) => println!("todo added: {}", todo),
+        // };
     }
 
     pub fn list(&mut self) {
