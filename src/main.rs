@@ -16,7 +16,7 @@ enum Commands {
 fn main() {
     // Initialize our todo client with default values
     // TODO: Replace with the real path name
-    let mut todo_client = todo::Todo {
+    let mut todo_client = todo::TodoClient {
         ..Default::default()
     };
 
