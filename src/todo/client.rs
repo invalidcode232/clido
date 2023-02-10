@@ -14,8 +14,9 @@ pub struct TodoClient<'a> {
 
 impl<'a> TodoClient<'a> {
     fn write(&mut self, data: Todo) {
-        // FIXME: Prevent it from writing a header
-        let mut writer = csv::Writer::from_writer(self.file.as_mut().unwrap());
+        let mut writer = csv::WriterBuilder::new()
+            .has_headers(false)
+            .from_writer(self.file.as_mut().unwrap());
 
         let write_res = writer.serialize(data.clone());
         match write_res {
@@ -48,7 +49,15 @@ impl<'a> TodoClient<'a> {
             Ok(file) => Some(file),
         };
 
-        // TODO: Add empty file checks, if empty, write header
+        let file = self.file.as_mut().unwrap();
+        if file.metadata().unwrap().len() == 0 {
+            let mut writer = csv::Writer::from_writer(file);
+            let write_res = writer.write_record(&["todo", "date_added"]);
+            match write_res {
+                Ok(_) => println!("wrote headers to todo.csv"),
+                Err(_) => panic!("failed to write headers"),
+            }
+        }
     }
 
     // Write a new todo to our file
