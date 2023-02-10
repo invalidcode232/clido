@@ -1,6 +1,4 @@
-use chrono::{DateTime, Local};
-
-pub struct Todo<'a> {
-    todo: &'a str,
-    date_added: DateTime<Local>,
+pub struct Todo {
+    pub todo: String,
+    pub date_added: String,
 }
