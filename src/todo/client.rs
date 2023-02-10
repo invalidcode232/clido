@@ -14,6 +14,7 @@ pub struct TodoClient<'a> {
 
 impl<'a> TodoClient<'a> {
     fn write(&mut self, data: Todo) {
+        // FIXME: Prevent it from writing a header
         let mut writer = csv::Writer::from_writer(self.file.as_mut().unwrap());
 
         let write_res = writer.serialize(data.clone());
@@ -46,6 +47,8 @@ impl<'a> TodoClient<'a> {
             Err(err) => panic!("couldn't create {}: {}", self.path.display(), err),
             Ok(file) => Some(file),
         };
+
+        // TODO: Add empty file checks, if empty, write header
     }
 
     // Write a new todo to our file
