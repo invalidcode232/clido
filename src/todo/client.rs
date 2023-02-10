@@ -23,6 +23,17 @@ impl<'a> TodoClient<'a> {
         }
     }
 
+    fn read(&mut self) -> Vec<Todo> {
+        let mut todos: Vec<Todo> = Vec::new();
+        let mut reader = csv::Reader::from_reader(self.file.as_mut().unwrap());
+        for result in reader.deserialize() {
+            let data: Todo = result.unwrap();
+            todos.push(data);
+        }
+
+        todos
+    }
+
     // Create a todo file if not exists, as well as storing the File to our struct
     pub fn init(&mut self) {
         self.file = match OpenOptions::new()
@@ -54,13 +65,7 @@ impl<'a> TodoClient<'a> {
             return;
         }
 
-        let mut todos: Vec<Todo> = Vec::new();
-        let mut reader = csv::Reader::from_reader(self.file.as_mut().unwrap());
-        for result in reader.deserialize() {
-            let data: Todo = result.unwrap();
-            todos.push(data);
-        }
-
+        let todos = self.read();
         let table_display = Table::new(todos).to_string();
         println!("{}", table_display);
     }
