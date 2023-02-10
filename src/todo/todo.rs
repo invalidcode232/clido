@@ -5,4 +5,5 @@ use tabled::Tabled;
 pub struct Todo {
     pub todo: String,
     pub date_added: String,
+    pub done: bool,
 }

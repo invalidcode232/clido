@@ -13,6 +13,7 @@ pub struct TodoClient<'a> {
 }
 
 impl<'a> TodoClient<'a> {
+    // Write a new record to csv
     fn write(&mut self, data: Todo) {
         let mut writer = csv::WriterBuilder::new()
             .has_headers(false)
@@ -25,6 +26,7 @@ impl<'a> TodoClient<'a> {
         }
     }
 
+    // Reads all records in the csv, returns a vector of string
     fn read(&mut self) -> Vec<Todo> {
         let mut todos: Vec<Todo> = Vec::new();
         let mut reader = csv::Reader::from_reader(self.file.as_mut().unwrap());
@@ -52,7 +54,7 @@ impl<'a> TodoClient<'a> {
         let file = self.file.as_mut().unwrap();
         if file.metadata().unwrap().len() == 0 {
             let mut writer = csv::Writer::from_writer(file);
-            let write_res = writer.write_record(&["todo", "date_added"]);
+            let write_res = writer.write_record(&["todo", "date_added", "done"]);
             match write_res {
                 Ok(_) => println!("wrote headers to todo.csv"),
                 Err(_) => panic!("failed to write headers"),
@@ -69,9 +71,11 @@ impl<'a> TodoClient<'a> {
         self.write(Todo {
             todo: todo.to_owned(),
             date_added: Local::now().format("%d/%m/%Y %H:%M").to_string(),
+            done: false,
         })
     }
 
+    // Lists all todos in a table format
     pub fn list(&mut self) {
         if self.file.is_none() {
             return;
