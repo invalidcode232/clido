@@ -28,7 +28,7 @@ fn main() {
 
     match &cli.command {
         Some(Commands::Add { todo }) => {
-            todo_client.write(todo);
+            todo_client.add(todo);
         }
         Some(Commands::List {}) => {
             todo_client.list();
