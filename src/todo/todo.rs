@@ -3,6 +3,7 @@ use tabled::Tabled;
 
 #[derive(Tabled, Deserialize, Serialize, Clone)]
 pub struct Todo {
+    pub index: i32,
     pub todo: String,
     pub date_added: String,
     pub done: bool,

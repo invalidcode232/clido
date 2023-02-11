@@ -26,7 +26,24 @@ impl<'a> TodoClient<'a> {
         }
     }
 
-    // Reads all records in the csv, returns a vector of string
+    fn write_all(&mut self, data: Vec<Todo>) {
+        let mut file_write_all = match OpenOptions::new().read(true).write(true).open(self.path) {
+            Ok(file) => Some(file),
+            Err(err) => panic!("error opening file: {}", err),
+        };
+
+        let mut writer = csv::WriterBuilder::new().from_writer(file_write_all.as_mut().unwrap());
+
+        data.iter().for_each(|todo| {
+            let write_res = writer.serialize(todo.clone());
+            match write_res {
+                Ok(_) => Default::default(),
+                Err(err) => println!("failed to write {}: {}", self.path.display(), err),
+            }
+        })
+    }
+
+    // Reads all records in the csv, returns a vector of Todo
     fn read(&mut self) -> Vec<Todo> {
         let mut todos: Vec<Todo> = Vec::new();
         let mut reader = csv::Reader::from_reader(self.file.as_mut().unwrap());
@@ -54,7 +71,7 @@ impl<'a> TodoClient<'a> {
         let file = self.file.as_mut().unwrap();
         if file.metadata().unwrap().len() == 0 {
             let mut writer = csv::Writer::from_writer(file);
-            let write_res = writer.write_record(&["todo", "date_added", "done"]);
+            let write_res = writer.write_record(&["index", "todo", "date_added", "done"]);
             match write_res {
                 Ok(_) => println!("wrote headers to todo.csv"),
                 Err(_) => panic!("failed to write headers"),
@@ -68,10 +85,13 @@ impl<'a> TodoClient<'a> {
             return;
         }
 
+        let todo_count = self.read().into_iter().count();
+        let new_todo_index: i32 = (todo_count as i32) + 1;
         self.write(Todo {
             todo: todo.to_owned(),
             date_added: Local::now().format("%d/%m/%Y %H:%M").to_string(),
             done: false,
+            index: new_todo_index,
         })
     }
 
@@ -84,6 +104,14 @@ impl<'a> TodoClient<'a> {
         let todos = self.read();
         let table_display = Table::new(todos).to_string();
         println!("{}", table_display);
+    }
+
+    pub fn set_done(&mut self, index: i32, is_done: bool) {
+        let mut todos = self.read().clone();
+        let mut row = todos.get_mut(index as usize).unwrap();
+        row.done = is_done;
+
+        self.write_all(todos);
     }
 }
 
