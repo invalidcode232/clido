@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use tabled::Tabled;
 
-#[derive(Tabled, Deserialize, Serialize, Clone)]
+#[derive(Tabled, Deserialize, Serialize, Clone, Debug)]
 pub struct Todo {
     pub index: i32,
     pub todo: String,
