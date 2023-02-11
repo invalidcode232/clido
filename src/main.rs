@@ -49,7 +49,7 @@ fn main() {
                 "true" => is_done_bool = true,
                 "f" => is_done_bool = false,
                 "false" => is_done_bool = false,
-                _ => println!("ss"),
+                _ => println!("invalid input, expected boolean."),
             }
 
             todo_client.set_done(index.to_owned(), is_done_bool)
