@@ -4,6 +4,9 @@ use clap::{Parser, Subcommand};
 use todo::client;
 
 #[derive(Parser)]
+#[command(name = "clido")]
+#[command(version = "1.0")]
+#[command(about = "A command line todo manager")]
 struct Cli {
     #[command(subcommand)]
     command: Option<Commands>,
@@ -11,9 +14,16 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Adds a todo to todo.csv
     Add { todo: String },
+
+    /// Lists all todo in a formatted table
     List {},
+
+    /// Sets a todo state
     Done { index: i32, is_done: String },
+
+    /// Removes a todo from todo.csv
     Remove { index: i32 },
 }
 
