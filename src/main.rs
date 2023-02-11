@@ -28,6 +28,7 @@ fn main() {
         ..Default::default()
     };
 
+    // Init function to create todo file and set some variables
     todo_client.init();
 
     // Initialize our Clap cli parser
@@ -42,7 +43,8 @@ fn main() {
         }
         Some(Commands::Done { index, is_done }) => {
             let mut is_done_bool = true;
-            match is_done.to_owned().as_str() {
+            // Convert string to bool
+            match is_done.trim().to_lowercase().as_str() {
                 "t" => is_done_bool = true,
                 "true" => is_done_bool = true,
                 "f" => is_done_bool = false,
