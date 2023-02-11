@@ -14,6 +14,7 @@ enum Commands {
     Add { todo: String },
     List {},
     Done { index: i32, is_done: String },
+    Remove { index: i32 },
 }
 
 fn main() {
@@ -51,6 +52,7 @@ fn main() {
 
             todo_client.set_done(index.to_owned(), is_done_bool)
         }
+        Some(Commands::Remove { index }) => todo_client.remove_todo(index.to_owned()),
         None => (),
     }
 }

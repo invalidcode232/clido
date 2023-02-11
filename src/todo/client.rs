@@ -27,20 +27,36 @@ impl<'a> TodoClient<'a> {
     }
 
     fn write_all(&mut self, data: Vec<Todo>) {
-        let mut file_write_all = match OpenOptions::new().read(true).write(true).open(self.path) {
+        let mut file_write_all = match OpenOptions::new()
+            .read(true)
+            .write(true)
+            .truncate(true)
+            .open(self.path)
+        {
             Ok(file) => Some(file),
             Err(err) => panic!("error opening file: {}", err),
         };
 
         let mut writer = csv::WriterBuilder::new().from_writer(file_write_all.as_mut().unwrap());
 
-        data.iter().for_each(|todo| {
+        // data.iter().for_each(|todo| {
+        //     let write_res = writer.serialize(todo.clone());
+        //     match write_res {
+        //         Ok(_) => Default::default(),
+        //         Err(err) => println!("failed to write {}: {}", self.path.display(), err),
+        //     }
+        // })
+
+        for (i, todo) in data.iter().enumerate() {
+            let mut todo = todo.clone();
+            todo.index = i as i32;
+
             let write_res = writer.serialize(todo.clone());
             match write_res {
                 Ok(_) => Default::default(),
                 Err(err) => println!("failed to write {}: {}", self.path.display(), err),
             }
-        })
+        }
     }
 
     // Reads all records in the csv, returns a vector of Todo
@@ -86,7 +102,7 @@ impl<'a> TodoClient<'a> {
         }
 
         let todo_count = self.read().into_iter().count();
-        let new_todo_index: i32 = (todo_count as i32) + 1;
+        let new_todo_index = todo_count as i32;
         self.write(Todo {
             todo: todo.to_owned(),
             date_added: Local::now().format("%d/%m/%Y %H:%M").to_string(),
@@ -102,14 +118,43 @@ impl<'a> TodoClient<'a> {
         }
 
         let todos = self.read();
+        // Convert to a Table for display
         let table_display = Table::new(todos).to_string();
         println!("{}", table_display);
     }
 
+    // Set todo done
     pub fn set_done(&mut self, index: i32, is_done: bool) {
         let mut todos = self.read().clone();
-        let mut row = todos.get_mut(index as usize).unwrap();
-        row.done = is_done;
+        match todos.get_mut(index as usize) {
+            Some(row) => {
+                row.done = is_done;
+                println!("successfully set index {} to {}", index, is_done);
+            }
+            None => {
+                println!("index not found");
+                return;
+            }
+        };
+
+        self.write_all(todos);
+    }
+
+    // Remove todo
+    pub fn remove_todo(&mut self, index: i32) {
+        let mut todos = self.read().clone();
+
+        // Check if todo exists, then remove it if it does
+        match todos.get(index as usize) {
+            Some(_) => {
+                todos.remove(index as usize);
+                println!("successfully deleted index {}", index);
+            }
+            None => {
+                println!("index not found");
+                return;
+            }
+        };
 
         self.write_all(todos);
     }
