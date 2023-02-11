@@ -119,16 +119,16 @@ impl<'a> TodoClient<'a> {
 
         let todos = self.read();
         // Convert to a Table for display
-        let table_display = Table::new(todos).to_string();
-        println!("{}", table_display);
+        let todo_table = Table::new(todos).to_string();
+        println!("{}", todo_table);
     }
 
     // Set todo done
     pub fn set_done(&mut self, index: i32, is_done: bool) {
         let mut todos = self.read().clone();
         match todos.get_mut(index as usize) {
-            Some(row) => {
-                row.done = is_done;
+            Some(todo) => {
+                todo.done = is_done;
                 println!("successfully set index {} to {}", index, is_done);
             }
             None => {
