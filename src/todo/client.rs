@@ -3,7 +3,7 @@ use std::fs::{File, OpenOptions};
 use std::path::Path;
 
 use chrono::Local;
-use tabled::Table;
+use tabled::{Style, Table};
 
 use super::todo::Todo;
 
@@ -119,7 +119,7 @@ impl<'a> TodoClient<'a> {
 
         let todos = self.read();
         // Convert to a Table for display
-        let todo_table = Table::new(todos).to_string();
+        let todo_table = Table::new(todos).with(Style::rounded()).to_string();
         println!("{}", todo_table);
     }
 
