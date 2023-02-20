@@ -1,18 +1,19 @@
 // Todo object for all our todo actions
 use std::fs::{File, OpenOptions};
-use std::path::Path;
+use std::path::PathBuf;
 
 use chrono::Local;
 use tabled::{Style, Table};
+extern crate xdg;
 
 use super::todo::Todo;
 
-pub struct TodoClient<'a> {
+pub struct TodoClient {
     pub file: Option<File>,
-    pub path: &'a Path,
+    pub path: PathBuf,
 }
 
-impl<'a> TodoClient<'a> {
+impl TodoClient {
     // Write a new record to csv
     fn write(&mut self, data: Todo) {
         let mut writer = csv::WriterBuilder::new()
@@ -31,7 +32,7 @@ impl<'a> TodoClient<'a> {
             .read(true)
             .write(true)
             .truncate(true)
-            .open(self.path)
+            .open(self.path.as_path())
         {
             Ok(file) => Some(file),
             Err(err) => panic!("error opening file: {}", err),
@@ -78,7 +79,7 @@ impl<'a> TodoClient<'a> {
             .write(true)
             .create(true)
             .append(true)
-            .open(self.path)
+            .open(self.path.as_path())
         {
             Err(err) => panic!("couldn't create {}: {}", self.path.display(), err),
             Ok(file) => Some(file),
@@ -161,11 +162,16 @@ impl<'a> TodoClient<'a> {
 }
 
 // Setting default values
-impl<'a> Default for TodoClient<'a> {
+impl Default for TodoClient {
     fn default() -> Self {
+        let xdg_dirs = xdg::BaseDirectories::with_prefix("clido").unwrap();
+        let csv_path = xdg_dirs
+            .place_data_file("todo.csv")
+            .expect("could not get todo directory");
+
         TodoClient {
             file: Default::default(),
-            path: Path::new("todo.csv"),
+            path: csv_path.to_owned(),
         }
     }
 }
@@ -184,7 +190,7 @@ mod tests {
         println!("{:?}", path);
 
         let mut todo_client = TodoClient {
-            path: path.as_path(),
+            path,
             ..Default::default()
         };
 

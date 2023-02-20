@@ -29,12 +29,7 @@ enum Commands {
 
 fn main() {
     // Initialize our todo client with default values
-    let path = dirs::home_dir()
-        .unwrap()
-        .join(".local/share/clido/todo.csv");
-
     let mut todo_client = client::TodoClient {
-        path: path.as_path(),
         ..Default::default()
     };
 
