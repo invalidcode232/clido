@@ -20,7 +20,7 @@ impl TodoClient {
             .has_headers(false)
             .from_writer(self.file.as_mut().unwrap());
 
-        let write_res = writer.serialize(data.clone());
+        let write_res = writer.serialize(&data);
         match write_res {
             Ok(_) => println!("todo added: {}", data.todo),
             Err(err) => println!("failed to write {}: {}", self.path.display(), err),
@@ -52,7 +52,7 @@ impl TodoClient {
             let mut todo = todo.clone();
             todo.index = i as i32;
 
-            let write_res = writer.serialize(todo.clone());
+            let write_res = writer.serialize(todo);
             match write_res {
                 Ok(_) => Default::default(),
                 Err(err) => println!("failed to write {}: {}", self.path.display(), err),
