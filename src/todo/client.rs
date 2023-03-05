@@ -126,7 +126,7 @@ impl TodoClient {
 
     // Set todo done
     pub fn set_done(&mut self, index: i32, is_done: bool) {
-        let mut todos = self.read().clone();
+        let mut todos = self.read();
         match todos.get_mut(index as usize) {
             Some(todo) => {
                 todo.done = is_done;
@@ -143,7 +143,7 @@ impl TodoClient {
 
     // Remove todo
     pub fn remove_todo(&mut self, index: i32) {
-        let mut todos = self.read().clone();
+        let mut todos = self.read();
 
         // Check if todo exists, then remove it if it does
         match todos.get(index as usize) {
